@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Vetic Pet Care — Live Dashboard</title>
+<title>Vetic Pet Care - Live Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <style>
 :root {
@@ -23,7 +22,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(127,111,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(127,111,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 .wrap{max-width:1240px;margin:0 auto;padding:28px 20px;position:relative;z-index:1;}
 
-/* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
 .brand{display:flex;align-items:center;gap:12px;}
 .brand-icon{width:42px;height:42px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;}
@@ -39,12 +37,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
 .btn-refresh-big{
-  display:flex;align-items:center;gap:8px;
-  background:var(--purple);color:#fff;
-  border:none;border-radius:10px;
-  font-family:var(--mono);font-size:13px;font-weight:500;
-  padding:10px 20px;cursor:pointer;
-  transition:all 0.2s;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;background:var(--purple);color:#fff;
+  border:none;border-radius:10px;font-family:var(--mono);font-size:13px;font-weight:500;
+  padding:10px 20px;cursor:pointer;transition:all 0.2s;white-space:nowrap;
 }
 .btn-refresh-big:hover{background:#6a5ce8;transform:translateY(-1px);}
 .btn-refresh-big:active{transform:scale(0.97);}
@@ -57,7 +52,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 .err{display:none;background:rgba(255,107,74,0.08);border:1px solid rgba(255,107,74,0.25);border-radius:10px;padding:14px 18px;font-size:12px;color:#ff9980;margin-bottom:20px;font-family:var(--mono);line-height:1.7;}
 
-/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:11px;margin-bottom:24px;}
 .mcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s;}
 .mcard:hover{border-color:var(--border2);}
@@ -66,7 +60,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mval{font-size:24px;font-weight:700;letter-spacing:-1px;line-height:1;}
 .msub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px;}
 
-/* CHARTS */
 .charts-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .cpanel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
 .cpanel.full{grid-column:1/-1;}
@@ -77,11 +70,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .ld{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
 .cw{position:relative;}
 
-/* SKELETON */
 .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-/* FOOTER */
 .footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-text{font-size:10px;font-family:var(--mono);color:var(--text3);}
 .footer-link{font-size:10px;font-family:var(--mono);color:var(--purple);text-decoration:none;opacity:0.7;}
@@ -94,16 +85,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 }
 </style>
 </head>
+
 <body>
 <div class="wrap">
-
-  <!-- HEADER -->
   <div class="header">
     <div class="brand">
       <div class="brand-icon">🐾</div>
       <div>
         <div class="brand-name">Vetic Pet Care</div>
-        <div class="brand-sub">Live Analytics · new_app_event_data</div>
+        <div class="brand-sub">Live Analytics - Google Sheets</div>
       </div>
     </div>
 
@@ -117,8 +107,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div class="sync-info">Auto-refresh in <span class="countdown" id="countdown">60:00</span></div>
       </div>
 
-      <!-- FIX 1: id="refreshBtn" + onclick now calls window.manualRefresh -->
-      <button class="btn-refresh-big" id="refreshBtn" onclick="window.manualRefresh()">
+      <button class="btn-refresh-big" id="refreshBtn" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
           <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
@@ -130,7 +119,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <div class="err" id="errBanner"></div>
 
-  <!-- METRICS -->
   <div class="metrics" id="metricsGrid">
     <div class="mcard skel" style="height:86px;"></div>
     <div class="mcard skel" style="height:86px;"></div>
@@ -140,17 +128,16 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="mcard skel" style="height:86px;"></div>
   </div>
 
-  <!-- CHARTS -->
   <div class="charts-2">
     <div class="cpanel">
       <div class="ptitle">Conversion funnel</div>
-      <div class="psub">users → session → intent → cart</div>
+      <div class="psub">users to session to intent to cart</div>
       <div class="cw" style="height:230px;"><canvas id="funnelChart"></canvas></div>
     </div>
 
     <div class="cpanel">
       <div class="ptitle">Intent breakdown</div>
-      <div class="psub">what users browsed</div>
+      <div class="psub">food, medicine, accessories</div>
       <div class="legend" id="intentLegend"></div>
       <div class="cw" style="height:195px;"><canvas id="intentChart"></canvas></div>
     </div>
@@ -158,7 +145,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <div class="charts-2">
     <div class="cpanel">
-      <div class="ptitle">Intent → cart conversion</div>
+      <div class="ptitle">Intent to cart conversion</div>
       <div class="psub">by product category</div>
       <div class="legend">
         <div class="li"><div class="ld" style="background:#1fcf8e;"></div>Intent</div>
@@ -177,102 +164,102 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="charts-2" style="margin-bottom:0;">
     <div class="cpanel full">
       <div class="ptitle">Top 10 clinics by user volume</div>
-      <div class="psub">clinic-associated sessions only</div>
+      <div class="psub">clinic rows from source sheet</div>
       <div class="cw" style="height:420px;"><canvas id="clinicChart"></canvas></div>
     </div>
   </div>
 
   <div class="footer">
-    <div class="footer-text">Source: Google Sheets · Tab: new_app_event_data · Auto-refresh every 60 min</div>
-    <a class="footer-link" href="https://docs.google.com/spreadsheets/d/1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E/edit?gid=1575033653" target="_blank">Open source sheet ↗</a>
+    <div class="footer-text">Source: Google Sheets - Auto-refresh every 60 min</div>
+    <a class="footer-link" href="https://docs.google.com/spreadsheets/d/1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E/edit?gid=1575033653" target="_blank">Open source sheet</a>
   </div>
-
 </div>
 
 <script>
-/* ============================================================
-   FIX 2: CORS proxy — allorigins tunnels the Google Sheets
-   CSV request so browsers don't block it with a CORS error.
-   Original direct URL was: docs.google.com/spreadsheets/...
-   ============================================================ */
 const SHEET_ID = '1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E';
-const GID      = '1575033653';
-const DIRECT_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-/* Wrap with allorigins so GitHub Pages can fetch it */
-const CSV_URL  = `https://api.allorigins.win/raw?url=${encodeURIComponent(DIRECT_CSV)}`;
-
+const GID = '1575033653';
+const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${GID}`;
 const REFRESH_MS = 60 * 60 * 1000;
 
-let charts    = {};
+let charts = {};
 let cdInterval = null;
 let nextRefresh = null;
 
-/* ---------- STATUS ---------- */
 function setStatus(state, text) {
   document.getElementById('sdot').className = 'sdot ' + state;
   document.getElementById('stext').textContent = text;
 }
+
 function showErr(msg) {
   const el = document.getElementById('errBanner');
   el.style.display = 'block';
-  el.innerHTML = `<strong>Could not fetch data.</strong> ${msg}<br>
-  Make sure the Google Sheet is shared → <em>Anyone with the link (Viewer)</em>`;
+  el.innerHTML = `<strong>Could not fetch data.</strong> ${msg}<br>Make sure the Google Sheet is shared with anyone who has the link.`;
 }
-function hideErr() { document.getElementById('errBanner').style.display = 'none'; }
 
-/* ---------- HELPERS ---------- */
+function hideErr() {
+  document.getElementById('errBanner').style.display = 'none';
+}
+
+function num(v) {
+  return Number(String(v ?? '').replace(/[,%]/g, '').trim()) || 0;
+}
+
 function fmt(n) {
   n = Number(n) || 0;
-  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
-  if (n >= 1e3) return (n/1e3).toFixed(1)+'k';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k';
   return String(Math.round(n));
 }
-function pct(a,b) {
-  a = Number(a)||0; b = Number(b)||0;
-  return b ? ((a/b)*100).toFixed(1)+'%' : '0%';
-}
-function isOne(v) { return String(v ?? '').trim() === '1'; }
-function hasVal(v) {
-  const x = String(v ?? '').trim().toLowerCase();
-  return x !== '' && x !== 'n/a' && x !== 'null' && x !== 'undefined';
+
+function pct(a, b) {
+  a = Number(a) || 0;
+  b = Number(b) || 0;
+  return b ? ((a / b) * 100).toFixed(1) + '%' : '0%';
 }
 
-/* ---------- METRICS ---------- */
 function buildMetrics(d) {
   const cards = [
-    {label:'Total users',   val:d.total.toLocaleString(), sub:'tracked today',                   ac:'#7f6fff'},
-    {label:'Session rate',  val:pct(d.sessions,d.total),  sub:fmt(d.sessions)+' sessions',       ac:'#1fcf8e'},
-    {label:'Login rate',    val:pct(d.loggedIn,d.total),  sub:fmt(d.loggedIn)+' logged in',      ac:'#4a9eff'},
-    {label:'Clinic-linked', val:fmt(d.clinicUsers),       sub:pct(d.clinicUsers,d.total),        ac:'#f5a623'},
-    {label:'Add to cart',   val:fmt(d.atc),               sub:'cart rate '+pct(d.atc,d.total),   ac:'#ff6b4a'},
-    {label:'With intent',   val:fmt(d.si),                sub:'intent rate '+pct(d.si,d.total),  ac:'#7f6fff'}
+    {label:'Total users', val:d.total.toLocaleString(), sub:'from summary row', ac:'#7f6fff'},
+    {label:'Session rate', val:pct(d.sessions,d.total), sub:fmt(d.sessions)+' sessions', ac:'#1fcf8e'},
+    {label:'With intent', val:fmt(d.si), sub:'intent rate '+pct(d.si,d.total), ac:'#4a9eff'},
+    {label:'Add to cart', val:fmt(d.atc), sub:'cart rate '+pct(d.atc,d.total), ac:'#ff6b4a'},
+    {label:'Food intent', val:fmt(d.foodI), sub:fmt(d.foodC)+' carts', ac:'#f5a623'},
+    {label:'Clinic volume', val:fmt(d.clinicUsers), sub:pct(d.clinicUsers,d.total), ac:'#7f6fff'}
   ];
+
   document.getElementById('metricsGrid').innerHTML = cards.map(c => `
     <div class="mcard" style="--ac:${c.ac}">
       <div class="mlabel">${c.label}</div>
       <div class="mval">${c.val}</div>
       <div class="msub">${c.sub}</div>
-    </div>`).join('');
+    </div>
+  `).join('');
 }
 
-/* ---------- CHARTS ---------- */
 const TC = 'rgba(255,255,255,0.38)';
 const GC = 'rgba(255,255,255,0.05)';
 const baseO = {
-  responsive:true, maintainAspectRatio:false,
+  responsive:true,
+  maintainAspectRatio:false,
   plugins:{legend:{display:false}},
   animation:{duration:500}
 };
+
 function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  if (charts[id]) {
+    charts[id].destroy();
+    delete charts[id];
+  }
 }
+
 function makeChart(id, cfg) {
   destroyChart(id);
   charts[id] = new Chart(document.getElementById(id), cfg);
 }
-function axis(extra={}) {
+
+function axis(extra = {}) {
   return {
-    ticks:{color:TC, font:{size:10}, ...(extra.ticks||{})},
+    ticks:{color:TC, font:{size:10}, ...(extra.ticks || {})},
     grid:{color:GC},
     border:{color:'transparent'},
     ...extra
@@ -280,16 +267,17 @@ function axis(extra={}) {
 }
 
 function buildCharts(d) {
-  const {total,sessions,si,atc,foodI,medI,accI,foodC,medC,accC,topClinics,loggedIn,clinicUsers} = d;
+  const {total,sessions,si,atc,foodI,medI,accI,foodC,medC,accC,topClinics,clinicUsers} = d;
 
-  makeChart('funnelChart',{
+  makeChart('funnelChart', {
     type:'bar',
     data:{
       labels:['Total','Sessions','Intent','Cart'],
       datasets:[{
         data:[total,sessions,si,atc],
         backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#ff6b4a'],
-        borderRadius:6, borderSkipped:false
+        borderRadius:6,
+        borderSkipped:false
       }]
     },
     options:{...baseO, scales:{
@@ -299,13 +287,14 @@ function buildCharts(d) {
   });
 
   const intentTotal = foodI + medI + accI;
-  document.getElementById('intentLegend').innerHTML = [
-    ['#1fcf8e','Food',    pct(foodI,intentTotal)],
-    ['#4a9eff','Medicine',pct(medI, intentTotal)],
-    ['#ff6b4a','Accessories',pct(accI,intentTotal)]
-  ].map(([c,l,p])=>`<div class="li"><div class="ld" style="background:${c};"></div>${l} ${p}</div>`).join('');
 
-  makeChart('intentChart',{
+  document.getElementById('intentLegend').innerHTML = [
+    ['#1fcf8e','Food',pct(foodI,intentTotal)],
+    ['#4a9eff','Medicine',pct(medI,intentTotal)],
+    ['#ff6b4a','Accessories',pct(accI,intentTotal)]
+  ].map(([c,l,p]) => `<div class="li"><div class="ld" style="background:${c};"></div>${l} ${p}</div>`).join('');
+
+  makeChart('intentChart', {
     type:'doughnut',
     data:{
       labels:['Food','Medicine','Accessories'],
@@ -318,13 +307,13 @@ function buildCharts(d) {
     options:{...baseO, cutout:'65%'}
   });
 
-  makeChart('convChart',{
+  makeChart('convChart', {
     type:'bar',
     data:{
       labels:['Food','Medicine','Accessories'],
       datasets:[
         {label:'Intent', data:[foodI,medI,accI], backgroundColor:'#1fcf8e', borderRadius:4},
-        {label:'Cart',   data:[foodC,medC,accC], backgroundColor:'#4a5568', borderRadius:4}
+        {label:'Cart', data:[foodC,medC,accC], backgroundColor:'#4a5568', borderRadius:4}
       ]
     },
     options:{...baseO, scales:{
@@ -333,20 +322,20 @@ function buildCharts(d) {
     }}
   });
 
-  makeChart('rateChart',{
+  makeChart('rateChart', {
     type:'bar',
     data:{
-      labels:['Session','Login','Clinic','Intent','Cart'],
+      labels:['Session','Clinic','Intent','Cart'],
       datasets:[{
         data:[
           total ? +((sessions/total)*100).toFixed(1) : 0,
-          total ? +((loggedIn/total)*100).toFixed(1) : 0,
           total ? +((clinicUsers/total)*100).toFixed(1) : 0,
           total ? +((si/total)*100).toFixed(1) : 0,
           total ? +((atc/total)*100).toFixed(1) : 0
         ],
-        backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#f5a623','#ff6b4a'],
-        borderRadius:6, borderSkipped:false
+        backgroundColor:['#7f6fff','#f5a623','#4a9eff','#ff6b4a'],
+        borderRadius:6,
+        borderSkipped:false
       }]
     },
     options:{...baseO, scales:{
@@ -355,14 +344,15 @@ function buildCharts(d) {
     }}
   });
 
-  makeChart('clinicChart',{
+  makeChart('clinicChart', {
     type:'bar',
     data:{
-      labels:topClinics.map(([k])=>k.length>48?k.slice(0,48)+'…':k),
+      labels:topClinics.map(([k]) => k.length > 48 ? k.slice(0,48) + '...' : k),
       datasets:[{
         label:'Users',
-        data:topClinics.map(([,v])=>v),
-        backgroundColor:'#7f6fff', borderRadius:4
+        data:topClinics.map(([,v]) => v),
+        backgroundColor:'#7f6fff',
+        borderRadius:4
       }]
     },
     options:{...baseO, indexAxis:'y', scales:{
@@ -372,79 +362,114 @@ function buildCharts(d) {
   });
 }
 
-/* ---------- DATA ---------- */
 function processRows(rows) {
-  const total       = rows.length;
-  const loggedIn    = rows.filter(r=>hasVal(r.user_id)).length;
-  const clinicUsers = rows.filter(r=>hasVal(r.clinic_billed_clinic)).length;
-  const sessions    = rows.filter(r=>isOne(r.session_start)).length;
-  const foodI = rows.filter(r=>isOne(r.food_intent)).length;
-  const medI  = rows.filter(r=>isOne(r.medicine_intent)).length;
-  const accI  = rows.filter(r=>isOne(r.accessories_intent)).length;
-  const foodC = rows.filter(r=>isOne(r.food_add_to_cart)).length;
-  const medC  = rows.filter(r=>isOne(r.medicine_add_to_cart)).length;
-  const accC  = rows.filter(r=>isOne(r.accessories_add_to_cart)).length;
-  const si  = rows.filter(r=>isOne(r.si)).length;
-  const atc = rows.filter(r=>isOne(r.add_to_cart)).length;
+  const totalRow = rows.find(r => String(r[0] || '').trim().toLowerCase() === 'total');
 
-  const clinicCount = {};
-  rows.forEach(r => {
-    const clinic = String(r.clinic_billed_clinic ?? '').trim();
-    if (clinic) clinicCount[clinic] = (clinicCount[clinic] || 0) + 1;
+  if (!totalRow) {
+    throw new Error('Could not find Total row in sheet');
+  }
+
+  const clinicRows = rows.filter(r => {
+    const name = String(r[0] || '').trim();
+    const lower = name.toLowerCase();
+    return name && lower !== 'total' && lower !== 'clinic name' && num(r[2]) > 0;
   });
-  const topClinics = Object.entries(clinicCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
 
-  return {total,loggedIn,clinicUsers,sessions,foodI,medI,accI,foodC,medC,accC,si,atc,topClinics};
+  const clinicUsers = clinicRows.reduce((sum, r) => sum + num(r[2]), 0);
+
+  const topClinics = clinicRows
+    .map(r => [String(r[0]).trim(), num(r[2])])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,10);
+
+  return {
+    total: num(totalRow[2]),
+    sessions: num(totalRow[3]),
+    foodI: num(totalRow[5]),
+    medI: num(totalRow[6]),
+    accI: num(totalRow[7]),
+    si: num(totalRow[9]),
+    atc: num(totalRow[13]),
+    foodC: num(totalRow[15]),
+    medC: num(totalRow[16]),
+    accC: num(totalRow[17]),
+    clinicUsers,
+    topClinics
+  };
 }
 
-/* ---------- COUNTDOWN ---------- */
+function fetchSheetRows() {
+  return new Promise((resolve, reject) => {
+    const cb = '__veticSheetCallback_' + Date.now();
+    const script = document.createElement('script');
+
+    window[cb] = function(resp) {
+      delete window[cb];
+      script.remove();
+
+      try {
+        const rows = resp.table.rows.map(row =>
+          row.c.map(cell => cell ? (cell.f ?? cell.v ?? '') : '')
+        );
+        resolve(rows);
+      } catch (e) {
+        reject(new Error('Could not parse Google Sheet response'));
+      }
+    };
+
+    script.src = `${GVIZ_URL}&tqx=responseHandler:${cb}&t=${Date.now()}`;
+    script.onerror = function() {
+      delete window[cb];
+      script.remove();
+      reject(new Error('Google Sheet script load failed'));
+    };
+
+    document.body.appendChild(script);
+  });
+}
+
 function startCountdown() {
   if (cdInterval) clearInterval(cdInterval);
+
   nextRefresh = Date.now() + REFRESH_MS;
+
   cdInterval = setInterval(() => {
     const rem = Math.max(0, nextRefresh - Date.now());
     const m = Math.floor(rem / 60000);
     const s = Math.floor((rem % 60000) / 1000);
+
     document.getElementById('countdown').textContent =
       String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+
     if (rem === 0) loadData();
   }, 1000);
 }
 
-/* ---------- LOAD ---------- */
 async function loadData() {
   setStatus('loading','Fetching live data...');
   hideErr();
+
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
 
   try {
-    const res = await fetch(CSV_URL + '&t=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await fetchSheetRows();
 
-    const text = await res.text();
-
-    /* Detect if proxy returned HTML error page instead of CSV */
-    if (text.trim().startsWith('<')) {
-      throw new Error('Proxy returned HTML — sheet may not be publicly shared');
+    if (!rows || !rows.length) {
+      throw new Error('Sheet returned 0 rows');
     }
 
-    const parsed = Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      transformHeader: h => String(h || '').trim().toLowerCase()
-    });
+    const d = processRows(rows);
 
-    if (!parsed.data || !parsed.data.length) throw new Error('Sheet returned 0 rows');
-
-    const d = processRows(parsed.data);
     buildMetrics(d);
     buildCharts(d);
 
     const now = new Date();
+
     document.getElementById('lastSync').textContent =
-      'Synced ' + now.toLocaleTimeString() + ' · ' + d.total.toLocaleString() + ' rows';
-    setStatus('live', 'Live · ' + d.total.toLocaleString() + ' rows');
+      'Synced ' + now.toLocaleTimeString() + ' - ' + d.total.toLocaleString() + ' users';
+
+    setStatus('live', 'Live - ' + d.total.toLocaleString() + ' users');
     startCountdown();
 
   } catch(e) {
@@ -456,13 +481,11 @@ async function loadData() {
   }
 }
 
-/* FIX 3: Expose manualRefresh on window so onclick="" can find it */
-window.manualRefresh = function() {
+document.getElementById('refreshBtn').addEventListener('click', function() {
   if (cdInterval) clearInterval(cdInterval);
   loadData();
-};
+});
 
-/* Initial load */
 loadData();
 </script>
 </body>
