@@ -117,7 +117,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div class="sync-info">Auto-refresh in <span class="countdown" id="countdown">60:00</span></div>
       </div>
 
-      <button class="btn-refresh-big" id="refreshBtn" onclick="manualRefresh()">
+      <!-- FIX 1: id="refreshBtn" + onclick now calls window.manualRefresh -->
+      <button class="btn-refresh-big" id="refreshBtn" onclick="window.manualRefresh()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
           <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
@@ -189,30 +190,35 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 </div>
 
 <script>
+/* ============================================================
+   FIX 2: CORS proxy — allorigins tunnels the Google Sheets
+   CSV request so browsers don't block it with a CORS error.
+   Original direct URL was: docs.google.com/spreadsheets/...
+   ============================================================ */
 const SHEET_ID = '1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E';
-const GID = '1575033653';
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+const GID      = '1575033653';
+const DIRECT_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+/* Wrap with allorigins so GitHub Pages can fetch it */
+const CSV_URL  = `https://api.allorigins.win/raw?url=${encodeURIComponent(DIRECT_CSV)}`;
+
 const REFRESH_MS = 60 * 60 * 1000;
 
-let charts = {};
+let charts    = {};
 let cdInterval = null;
 let nextRefresh = null;
-let currentData = null;
 
 /* ---------- STATUS ---------- */
 function setStatus(state, text) {
   document.getElementById('sdot').className = 'sdot ' + state;
   document.getElementById('stext').textContent = text;
 }
-
 function showErr(msg) {
   const el = document.getElementById('errBanner');
   el.style.display = 'block';
-  el.innerHTML = `<strong>Could not fetch data.</strong> ${msg}<br>Check Google Sheet sharing → <em>Anyone with the link (Viewer)</em>`;
+  el.innerHTML = `<strong>Could not fetch data.</strong> ${msg}<br>
+  Make sure the Google Sheet is shared → <em>Anyone with the link (Viewer)</em>`;
 }
-function hideErr() {
-  document.getElementById('errBanner').style.display = 'none';
-}
+function hideErr() { document.getElementById('errBanner').style.display = 'none'; }
 
 /* ---------- HELPERS ---------- */
 function fmt(n) {
@@ -222,13 +228,10 @@ function fmt(n) {
   return String(Math.round(n));
 }
 function pct(a,b) {
-  a = Number(a) || 0;
-  b = Number(b) || 0;
+  a = Number(a)||0; b = Number(b)||0;
   return b ? ((a/b)*100).toFixed(1)+'%' : '0%';
 }
-function isOne(v) {
-  return String(v ?? '').trim() === '1';
-}
+function isOne(v) { return String(v ?? '').trim() === '1'; }
 function hasVal(v) {
   const x = String(v ?? '').trim().toLowerCase();
   return x !== '' && x !== 'n/a' && x !== 'null' && x !== 'undefined';
@@ -237,46 +240,39 @@ function hasVal(v) {
 /* ---------- METRICS ---------- */
 function buildMetrics(d) {
   const cards = [
-    {label:'Total users',   val:d.total.toLocaleString(), sub:'tracked today', ac:'#7f6fff'},
-    {label:'Session rate',  val:pct(d.sessions,d.total),  sub:fmt(d.sessions)+' sessions', ac:'#1fcf8e'},
-    {label:'Login rate',    val:pct(d.loggedIn,d.total),  sub:fmt(d.loggedIn)+' logged in', ac:'#4a9eff'},
-    {label:'Clinic-linked', val:fmt(d.clinicUsers),       sub:pct(d.clinicUsers,d.total), ac:'#f5a623'},
-    {label:'Add to cart',   val:fmt(d.atc),               sub:'cart rate '+pct(d.atc,d.total), ac:'#ff6b4a'},
-    {label:'With intent',   val:fmt(d.si),                sub:'intent rate '+pct(d.si,d.total), ac:'#7f6fff'}
+    {label:'Total users',   val:d.total.toLocaleString(), sub:'tracked today',                   ac:'#7f6fff'},
+    {label:'Session rate',  val:pct(d.sessions,d.total),  sub:fmt(d.sessions)+' sessions',       ac:'#1fcf8e'},
+    {label:'Login rate',    val:pct(d.loggedIn,d.total),  sub:fmt(d.loggedIn)+' logged in',      ac:'#4a9eff'},
+    {label:'Clinic-linked', val:fmt(d.clinicUsers),       sub:pct(d.clinicUsers,d.total),        ac:'#f5a623'},
+    {label:'Add to cart',   val:fmt(d.atc),               sub:'cart rate '+pct(d.atc,d.total),   ac:'#ff6b4a'},
+    {label:'With intent',   val:fmt(d.si),                sub:'intent rate '+pct(d.si,d.total),  ac:'#7f6fff'}
   ];
-
   document.getElementById('metricsGrid').innerHTML = cards.map(c => `
     <div class="mcard" style="--ac:${c.ac}">
       <div class="mlabel">${c.label}</div>
       <div class="mval">${c.val}</div>
       <div class="msub">${c.sub}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 /* ---------- CHARTS ---------- */
 const TC = 'rgba(255,255,255,0.38)';
 const GC = 'rgba(255,255,255,0.05)';
 const baseO = {
-  responsive:true,
-  maintainAspectRatio:false,
+  responsive:true, maintainAspectRatio:false,
   plugins:{legend:{display:false}},
   animation:{duration:500}
 };
-
-function destroyChart(id){
-  if(charts[id]) {
-    charts[id].destroy();
-    delete charts[id];
-  }
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
 }
-function makeChart(id, cfg){
+function makeChart(id, cfg) {
   destroyChart(id);
   charts[id] = new Chart(document.getElementById(id), cfg);
 }
 function axis(extra={}) {
   return {
-    ticks:{color:TC,font:{size:10},...(extra.ticks||{})},
+    ticks:{color:TC, font:{size:10}, ...(extra.ticks||{})},
     grid:{color:GC},
     border:{color:'transparent'},
     ...extra
@@ -293,26 +289,21 @@ function buildCharts(d) {
       datasets:[{
         data:[total,sessions,si,atc],
         backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#ff6b4a'],
-        borderRadius:6,
-        borderSkipped:false
+        borderRadius:6, borderSkipped:false
       }]
     },
-    options:{
-      ...baseO,
-      scales:{
-        x:axis({ticks:{color:TC,font:{size:11},autoSkip:false,maxRotation:0}}),
-        y:axis({ticks:{callback:v=>fmt(v)}})
-      }
-    }
+    options:{...baseO, scales:{
+      x:axis({ticks:{color:TC,font:{size:11},autoSkip:false,maxRotation:0}}),
+      y:axis({ticks:{callback:v=>fmt(v)}})
+    }}
   });
 
   const intentTotal = foodI + medI + accI;
-
   document.getElementById('intentLegend').innerHTML = [
-    ['#1fcf8e','Food',pct(foodI,intentTotal)],
-    ['#4a9eff','Medicine',pct(medI,intentTotal)],
+    ['#1fcf8e','Food',    pct(foodI,intentTotal)],
+    ['#4a9eff','Medicine',pct(medI, intentTotal)],
     ['#ff6b4a','Accessories',pct(accI,intentTotal)]
-  ].map(([c,l,p]) => `<div class="li"><div class="ld" style="background:${c};"></div>${l} ${p}</div>`).join('');
+  ].map(([c,l,p])=>`<div class="li"><div class="ld" style="background:${c};"></div>${l} ${p}</div>`).join('');
 
   makeChart('intentChart',{
     type:'doughnut',
@@ -324,10 +315,7 @@ function buildCharts(d) {
         borderWidth:0
       }]
     },
-    options:{
-      ...baseO,
-      cutout:'65%'
-    }
+    options:{...baseO, cutout:'65%'}
   });
 
   makeChart('convChart',{
@@ -335,17 +323,14 @@ function buildCharts(d) {
     data:{
       labels:['Food','Medicine','Accessories'],
       datasets:[
-        {label:'Intent',data:[foodI,medI,accI],backgroundColor:'#1fcf8e',borderRadius:4},
-        {label:'Cart',data:[foodC,medC,accC],backgroundColor:'#4a5568',borderRadius:4}
+        {label:'Intent', data:[foodI,medI,accI], backgroundColor:'#1fcf8e', borderRadius:4},
+        {label:'Cart',   data:[foodC,medC,accC], backgroundColor:'#4a5568', borderRadius:4}
       ]
     },
-    options:{
-      ...baseO,
-      scales:{
-        x:axis(),
-        y:axis({ticks:{callback:v=>fmt(v)}})
-      }
-    }
+    options:{...baseO, scales:{
+      x:axis(),
+      y:axis({ticks:{callback:v=>fmt(v)}})
+    }}
   });
 
   makeChart('rateChart',{
@@ -354,108 +339,95 @@ function buildCharts(d) {
       labels:['Session','Login','Clinic','Intent','Cart'],
       datasets:[{
         data:[
-          total ? +(sessions/total*100).toFixed(1) : 0,
-          total ? +(loggedIn/total*100).toFixed(1) : 0,
-          total ? +(clinicUsers/total*100).toFixed(1) : 0,
-          total ? +(si/total*100).toFixed(1) : 0,
-          total ? +(atc/total*100).toFixed(1) : 0
+          total ? +((sessions/total)*100).toFixed(1) : 0,
+          total ? +((loggedIn/total)*100).toFixed(1) : 0,
+          total ? +((clinicUsers/total)*100).toFixed(1) : 0,
+          total ? +((si/total)*100).toFixed(1) : 0,
+          total ? +((atc/total)*100).toFixed(1) : 0
         ],
         backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#f5a623','#ff6b4a'],
-        borderRadius:6,
-        borderSkipped:false
+        borderRadius:6, borderSkipped:false
       }]
     },
-    options:{
-      ...baseO,
-      scales:{
-        x:axis({ticks:{autoSkip:false,maxRotation:0}}),
-        y:axis({ticks:{callback:v=>v+'%'},max:100})
-      }
-    }
+    options:{...baseO, scales:{
+      x:axis({ticks:{autoSkip:false,maxRotation:0}}),
+      y:axis({ticks:{callback:v=>v+'%'}, max:100})
+    }}
   });
 
   makeChart('clinicChart',{
     type:'bar',
     data:{
-      labels:topClinics.map(([k]) => k.length > 48 ? k.slice(0,48)+'…' : k),
+      labels:topClinics.map(([k])=>k.length>48?k.slice(0,48)+'…':k),
       datasets:[{
         label:'Users',
-        data:topClinics.map(([,v]) => v),
-        backgroundColor:'#7f6fff',
-        borderRadius:4
+        data:topClinics.map(([,v])=>v),
+        backgroundColor:'#7f6fff', borderRadius:4
       }]
     },
-    options:{
-      ...baseO,
-      indexAxis:'y',
-      scales:{
-        x:axis({ticks:{callback:v=>fmt(v)}}),
-        y:axis({ticks:{autoSkip:false},grid:{color:'transparent'}})
-      }
-    }
+    options:{...baseO, indexAxis:'y', scales:{
+      x:axis({ticks:{callback:v=>fmt(v)}}),
+      y:axis({ticks:{autoSkip:false}, grid:{color:'transparent'}})
+    }}
   });
 }
 
 /* ---------- DATA ---------- */
 function processRows(rows) {
-  const total = rows.length;
-  const loggedIn = rows.filter(r => hasVal(r.user_id)).length;
-  const clinicUsers = rows.filter(r => hasVal(r.clinic_billed_clinic)).length;
-  const sessions = rows.filter(r => isOne(r.session_start)).length;
-
-  const foodI = rows.filter(r => isOne(r.food_intent)).length;
-  const medI  = rows.filter(r => isOne(r.medicine_intent)).length;
-  const accI  = rows.filter(r => isOne(r.accessories_intent)).length;
-
-  const foodC = rows.filter(r => isOne(r.food_add_to_cart)).length;
-  const medC  = rows.filter(r => isOne(r.medicine_add_to_cart)).length;
-  const accC  = rows.filter(r => isOne(r.accessories_add_to_cart)).length;
-
-  const si  = rows.filter(r => isOne(r.si)).length;
-  const atc = rows.filter(r => isOne(r.add_to_cart)).length;
+  const total       = rows.length;
+  const loggedIn    = rows.filter(r=>hasVal(r.user_id)).length;
+  const clinicUsers = rows.filter(r=>hasVal(r.clinic_billed_clinic)).length;
+  const sessions    = rows.filter(r=>isOne(r.session_start)).length;
+  const foodI = rows.filter(r=>isOne(r.food_intent)).length;
+  const medI  = rows.filter(r=>isOne(r.medicine_intent)).length;
+  const accI  = rows.filter(r=>isOne(r.accessories_intent)).length;
+  const foodC = rows.filter(r=>isOne(r.food_add_to_cart)).length;
+  const medC  = rows.filter(r=>isOne(r.medicine_add_to_cart)).length;
+  const accC  = rows.filter(r=>isOne(r.accessories_add_to_cart)).length;
+  const si  = rows.filter(r=>isOne(r.si)).length;
+  const atc = rows.filter(r=>isOne(r.add_to_cart)).length;
 
   const clinicCount = {};
   rows.forEach(r => {
     const clinic = String(r.clinic_billed_clinic ?? '').trim();
     if (clinic) clinicCount[clinic] = (clinicCount[clinic] || 0) + 1;
   });
+  const topClinics = Object.entries(clinicCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
 
-  const topClinics = Object.entries(clinicCount)
-    .sort((a,b) => b[1] - a[1])
-    .slice(0,10);
-
-  return { total, loggedIn, clinicUsers, sessions, foodI, medI, accI, foodC, medC, accC, si, atc, topClinics };
+  return {total,loggedIn,clinicUsers,sessions,foodI,medI,accI,foodC,medC,accC,si,atc,topClinics};
 }
 
+/* ---------- COUNTDOWN ---------- */
 function startCountdown() {
   if (cdInterval) clearInterval(cdInterval);
-
   nextRefresh = Date.now() + REFRESH_MS;
-
   cdInterval = setInterval(() => {
     const rem = Math.max(0, nextRefresh - Date.now());
     const m = Math.floor(rem / 60000);
     const s = Math.floor((rem % 60000) / 1000);
-
     document.getElementById('countdown').textContent =
       String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-
     if (rem === 0) loadData();
   }, 1000);
 }
 
+/* ---------- LOAD ---------- */
 async function loadData() {
   setStatus('loading','Fetching live data...');
   hideErr();
-
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
 
   try {
-    const res = await fetch(CSV_URL + '&cb=' + Date.now());
+    const res = await fetch(CSV_URL + '&t=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
     const text = await res.text();
+
+    /* Detect if proxy returned HTML error page instead of CSV */
+    if (text.trim().startsWith('<')) {
+      throw new Error('Proxy returned HTML — sheet may not be publicly shared');
+    }
 
     const parsed = Papa.parse(text, {
       header: true,
@@ -463,26 +435,19 @@ async function loadData() {
       transformHeader: h => String(h || '').trim().toLowerCase()
     });
 
-    if (!parsed.data || !parsed.data.length) {
-      throw new Error('Sheet returned 0 rows');
-    }
+    if (!parsed.data || !parsed.data.length) throw new Error('Sheet returned 0 rows');
 
-    console.log('CSV Headers:', Object.keys(parsed.data[0]));
-    console.log('First Row:', parsed.data[0]);
-
-    currentData = processRows(parsed.data);
-
-    buildMetrics(currentData);
-    buildCharts(currentData);
+    const d = processRows(parsed.data);
+    buildMetrics(d);
+    buildCharts(d);
 
     const now = new Date();
     document.getElementById('lastSync').textContent =
-      'Synced ' + now.toLocaleTimeString() + ' · ' + currentData.total.toLocaleString() + ' rows';
-
-    setStatus('live', 'Live · ' + currentData.total.toLocaleString() + ' rows');
+      'Synced ' + now.toLocaleTimeString() + ' · ' + d.total.toLocaleString() + ' rows';
+    setStatus('live', 'Live · ' + d.total.toLocaleString() + ' rows');
     startCountdown();
 
-  } catch (e) {
+  } catch(e) {
     console.error(e);
     setStatus('error','Fetch failed');
     showErr(e.message);
@@ -491,12 +456,13 @@ async function loadData() {
   }
 }
 
-function manualRefresh() {
+/* FIX 3: Expose manualRefresh on window so onclick="" can find it */
+window.manualRefresh = function() {
   if (cdInterval) clearInterval(cdInterval);
   loadData();
-}
+};
 
-setInterval(loadData, REFRESH_MS);
+/* Initial load */
 loadData();
 </script>
 </body>
