@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Vetic Pet Care — Live Dashboard</title>
+<title>Vetic Pet Care - Live Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <style>
 :root {
@@ -22,42 +21,32 @@ html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(127,111,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(127,111,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 .wrap{max-width:1240px;margin:0 auto;padding:28px 20px;position:relative;z-index:1;}
-
-/* HEADER */
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:14px;}
 .brand{display:flex;align-items:center;gap:12px;}
 .brand-icon{width:42px;height:42px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;}
 .brand-name{font-size:20px;font-weight:700;letter-spacing:-0.5px;}
 .brand-sub{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px;}
 .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-
 .status-pill{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:100px;padding:6px 14px;font-size:11px;font-family:var(--mono);color:var(--text2);}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--text3);transition:background 0.4s;}
 .sdot.live{background:var(--teal);box-shadow:0 0 6px var(--teal);}
 .sdot.error{background:var(--coral);}
 .sdot.loading{background:var(--amber);animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-
-.btn-refresh-big{
-  display:flex;align-items:center;gap:8px;
-  background:var(--purple);color:#fff;
-  border:none;border-radius:10px;
-  font-family:var(--mono);font-size:13px;font-weight:500;
-  padding:10px 20px;cursor:pointer;
-  transition:all 0.2s;white-space:nowrap;
-}
-.btn-refresh-big:hover{background:#6a5ce8;transform:translateY(-1px);}
-.btn-refresh-big:active{transform:scale(0.97);}
-.btn-refresh-big svg{width:15px;height:15px;flex-shrink:0;}
-.btn-refresh-big.spinning svg{animation:spin 0.8s linear infinite;}
+.btn{display:flex;align-items:center;gap:8px;background:var(--purple);color:#fff;border:none;border-radius:10px;font-family:var(--mono);font-size:13px;font-weight:500;padding:10px 16px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn:hover{background:#6a5ce8;transform:translateY(-1px);}
+.btn:active{transform:scale(0.97);}
+.btn svg{width:15px;height:15px;flex-shrink:0;}
+.btn.spinning svg{animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .sync-info{font-size:11px;font-family:var(--mono);color:var(--text3);}
 .countdown{color:var(--purple);font-weight:500;}
-
 .err{display:none;background:rgba(255,107,74,0.08);border:1px solid rgba(255,107,74,0.25);border-radius:10px;padding:14px 18px;font-size:12px;color:#ff9980;margin-bottom:20px;font-family:var(--mono);line-height:1.7;}
-
-/* METRICS */
+.filters{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px;}
+.field label{display:block;font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;}
+.field input,.field select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 11px;outline:none;}
+.field input:focus,.field select:focus{border-color:var(--purple);}
+.hint{font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.5;align-self:end;}
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:11px;margin-bottom:24px;}
 .mcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color 0.2s;}
 .mcard:hover{border-color:var(--border2);}
@@ -65,10 +54,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mlabel{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
 .mval{font-size:24px;font-weight:700;letter-spacing:-1px;line-height:1;}
 .msub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px;}
-
-/* CHARTS */
+.grid-main{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;}
 .charts-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.cpanel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.cpanel,.copilot{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
 .cpanel.full{grid-column:1/-1;}
 .ptitle{font-size:13px;font-weight:500;margin-bottom:3px;}
 .psub{font-size:10px;font-family:var(--mono);color:var(--text3);margin-bottom:14px;}
@@ -76,138 +64,153 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .li{display:flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--text2);}
 .ld{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
 .cw{position:relative;}
-
-/* SKELETON */
+.copilot{position:sticky;top:18px;height:fit-content;}
+.chat{display:flex;flex-direction:column;gap:10px;max-height:462px;overflow:auto;padding-right:2px;margin-bottom:12px;}
+.msg{font-size:12px;line-height:1.55;border-radius:10px;padding:10px 11px;}
+.msg.bot{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.msg.user{background:rgba(127,111,255,0.16);color:var(--text);border:1px solid rgba(127,111,255,0.28);align-self:flex-end;}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.chip{background:var(--bg3);border:1px solid var(--border2);border-radius:100px;color:var(--text2);font-family:var(--mono);font-size:10px;padding:7px 9px;cursor:pointer;}
+.chip:hover{border-color:var(--purple);color:var(--text);}
+.ask{display:flex;gap:8px;}
+.ask input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 11px;outline:none;}
+.ask button{background:var(--teal);color:#06120e;border:none;border-radius:10px;font-family:var(--mono);font-size:12px;font-weight:500;padding:0 12px;cursor:pointer;}
 .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* FOOTER */
 .footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.footer-text{font-size:10px;font-family:var(--mono);color:var(--text3);}
-.footer-link{font-size:10px;font-family:var(--mono);color:var(--purple);text-decoration:none;opacity:0.7;}
+.footer-text,.footer-link{font-size:10px;font-family:var(--mono);}
+.footer-text{color:var(--text3);}
+.footer-link{color:var(--purple);text-decoration:none;opacity:0.7;}
 .footer-link:hover{opacity:1;}
-
-@media(max-width:640px){
-  .charts-2{grid-template-columns:1fr;}
-  .cpanel.full{grid-column:1;}
-  .header{flex-direction:column;align-items:flex-start;}
-}
+@media(max-width:980px){.grid-main{grid-template-columns:1fr}.copilot{position:relative;top:0}.filters{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.charts-2,.filters{grid-template-columns:1fr}.cpanel.full{grid-column:1}.header{flex-direction:column;align-items:flex-start}.header-actions{width:100%;justify-content:space-between}.mval{font-size:22px}}
 </style>
 </head>
+
 <body>
 <div class="wrap">
-
-  <!-- HEADER -->
   <div class="header">
     <div class="brand">
       <div class="brand-icon">🐾</div>
       <div>
         <div class="brand-name">Vetic Pet Care</div>
-        <div class="brand-sub">Live Analytics · new_app_event_data</div>
+        <div class="brand-sub">Live Analytics - Google Sheets</div>
       </div>
     </div>
-
     <div class="header-actions">
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-        <div class="status-pill">
-          <div class="sdot loading" id="sdot"></div>
-          <span id="stext">Connecting...</span>
-        </div>
+        <div class="status-pill"><div class="sdot loading" id="sdot"></div><span id="stext">Connecting...</span></div>
         <div class="sync-info" id="lastSync"></div>
         <div class="sync-info">Auto-refresh in <span class="countdown" id="countdown">60:00</span></div>
       </div>
-
-      <!-- FIX 1: id="refreshBtn" + onclick now calls window.manualRefresh -->
-      <button class="btn-refresh-big" id="refreshBtn" onclick="window.manualRefresh()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
-          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-        </svg>
-        Refresh Data
+      <button class="btn" id="refreshBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Refresh
       </button>
     </div>
   </div>
 
   <div class="err" id="errBanner"></div>
 
-  <!-- METRICS -->
+  <div class="filters">
+    <div class="field">
+      <label for="startDate">Start Date</label>
+      <input id="startDate" type="date">
+    </div>
+    <div class="field">
+      <label for="endDate">End Date</label>
+      <input id="endDate" type="date">
+    </div>
+    <div class="field">
+      <label for="cityFilter">City</label>
+      <select id="cityFilter"><option value="all">All cities</option></select>
+    </div>
+    <div class="hint" id="filterHint">Date is read from the current summary sheet. City is inferred from clinic names when the City column is blank.</div>
+  </div>
+
   <div class="metrics" id="metricsGrid">
-    <div class="mcard skel" style="height:86px;"></div>
-    <div class="mcard skel" style="height:86px;"></div>
-    <div class="mcard skel" style="height:86px;"></div>
-    <div class="mcard skel" style="height:86px;"></div>
-    <div class="mcard skel" style="height:86px;"></div>
-    <div class="mcard skel" style="height:86px;"></div>
+    <div class="mcard skel" style="height:86px;"></div><div class="mcard skel" style="height:86px;"></div><div class="mcard skel" style="height:86px;"></div>
+    <div class="mcard skel" style="height:86px;"></div><div class="mcard skel" style="height:86px;"></div><div class="mcard skel" style="height:86px;"></div>
   </div>
 
-  <!-- CHARTS -->
-  <div class="charts-2">
-    <div class="cpanel">
-      <div class="ptitle">Conversion funnel</div>
-      <div class="psub">users → session → intent → cart</div>
-      <div class="cw" style="height:230px;"><canvas id="funnelChart"></canvas></div>
-    </div>
-
-    <div class="cpanel">
-      <div class="ptitle">Intent breakdown</div>
-      <div class="psub">what users browsed</div>
-      <div class="legend" id="intentLegend"></div>
-      <div class="cw" style="height:195px;"><canvas id="intentChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="charts-2">
-    <div class="cpanel">
-      <div class="ptitle">Intent → cart conversion</div>
-      <div class="psub">by product category</div>
-      <div class="legend">
-        <div class="li"><div class="ld" style="background:#1fcf8e;"></div>Intent</div>
-        <div class="li"><div class="ld" style="background:#4a5568;"></div>Add to cart</div>
+  <div class="grid-main">
+    <div>
+      <div class="charts-2">
+        <div class="cpanel">
+          <div class="ptitle">Conversion funnel</div>
+          <div class="psub">users to session to intent to cart</div>
+          <div class="cw" style="height:230px;"><canvas id="funnelChart"></canvas></div>
+        </div>
+        <div class="cpanel">
+          <div class="ptitle">Intent breakdown</div>
+          <div class="psub">food, medicine, accessories</div>
+          <div class="legend" id="intentLegend"></div>
+          <div class="cw" style="height:195px;"><canvas id="intentChart"></canvas></div>
+        </div>
       </div>
-      <div class="cw" style="height:170px;"><canvas id="convChart"></canvas></div>
+
+      <div class="charts-2">
+        <div class="cpanel">
+          <div class="ptitle">Intent to cart conversion</div>
+          <div class="psub">by product category</div>
+          <div class="legend">
+            <div class="li"><div class="ld" style="background:#1fcf8e;"></div>Intent</div>
+            <div class="li"><div class="ld" style="background:#4a5568;"></div>Add to cart</div>
+          </div>
+          <div class="cw" style="height:170px;"><canvas id="convChart"></canvas></div>
+        </div>
+        <div class="cpanel">
+          <div class="ptitle">Engagement rates</div>
+          <div class="psub">% of total users</div>
+          <div class="cw" style="height:210px;"><canvas id="rateChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-2" style="margin-bottom:0;">
+        <div class="cpanel full">
+          <div class="ptitle">Top 10 clinics by user volume</div>
+          <div class="psub">filtered by selected city</div>
+          <div class="cw" style="height:420px;"><canvas id="clinicChart"></canvas></div>
+        </div>
+      </div>
     </div>
 
-    <div class="cpanel">
-      <div class="ptitle">Engagement rates</div>
-      <div class="psub">% of total users</div>
-      <div class="cw" style="height:210px;"><canvas id="rateChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="charts-2" style="margin-bottom:0;">
-    <div class="cpanel full">
-      <div class="ptitle">Top 10 clinics by user volume</div>
-      <div class="psub">clinic-associated sessions only</div>
-      <div class="cw" style="height:420px;"><canvas id="clinicChart"></canvas></div>
-    </div>
+    <aside class="copilot">
+      <div class="ptitle">KPI Copilot</div>
+      <div class="psub">Ask about KPI, city, clinic, week, intent, cart</div>
+      <div class="chips">
+        <button class="chip" data-q="show KPI summary">KPI summary</button>
+        <button class="chip" data-q="top clinics">Top clinics</button>
+        <button class="chip" data-q="top city">Top city</button>
+        <button class="chip" data-q="cart rate">Cart rate</button>
+        <button class="chip" data-q="week data">Week data</button>
+      </div>
+      <div class="chat" id="chat"></div>
+      <div class="ask">
+        <input id="askInput" placeholder="Ask: city performance, top clinic, cart rate..." />
+        <button id="askBtn" type="button">Ask</button>
+      </div>
+    </aside>
   </div>
 
   <div class="footer">
-    <div class="footer-text">Source: Google Sheets · Tab: new_app_event_data · Auto-refresh every 60 min</div>
-    <a class="footer-link" href="https://docs.google.com/spreadsheets/d/1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E/edit?gid=1575033653" target="_blank">Open source sheet ↗</a>
+    <div class="footer-text">Source: Google Sheets - Auto-refresh every 60 min</div>
+    <a class="footer-link" href="https://docs.google.com/spreadsheets/d/1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E/edit?gid=1575033653" target="_blank">Open source sheet</a>
   </div>
-
 </div>
 
 <script>
-/* ============================================================
-   FIX 2: CORS proxy — allorigins tunnels the Google Sheets
-   CSV request so browsers don't block it with a CORS error.
-   Original direct URL was: docs.google.com/spreadsheets/...
-   ============================================================ */
 const SHEET_ID = '1GbYNBZ3fl7ctmYuy1T4h-WgCoXb098804s0zy2fQG8E';
-const GID      = '1575033653';
-const DIRECT_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-/* Wrap with allorigins so GitHub Pages can fetch it */
-const CSV_URL  = `https://api.allorigins.win/raw?url=${encodeURIComponent(DIRECT_CSV)}`;
-
+const GID = '1575033653';
+const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${GID}`;
 const REFRESH_MS = 60 * 60 * 1000;
 
-let charts    = {};
+let charts = {};
 let cdInterval = null;
 let nextRefresh = null;
+let rawModel = null;
+let activeData = null;
 
-/* ---------- STATUS ---------- */
 function setStatus(state, text) {
   document.getElementById('sdot').className = 'sdot ' + state;
   document.getElementById('stext').textContent = text;
@@ -215,254 +218,265 @@ function setStatus(state, text) {
 function showErr(msg) {
   const el = document.getElementById('errBanner');
   el.style.display = 'block';
-  el.innerHTML = `<strong>Could not fetch data.</strong> ${msg}<br>
-  Make sure the Google Sheet is shared → <em>Anyone with the link (Viewer)</em>`;
+  el.innerHTML = `<strong>Could not fetch data.</strong> ${msg}<br>Make sure the Google Sheet is shared with anyone who has the link.`;
 }
 function hideErr() { document.getElementById('errBanner').style.display = 'none'; }
-
-/* ---------- HELPERS ---------- */
+function num(v) { return Number(String(v ?? '').replace(/[,%]/g, '').trim()) || 0; }
 function fmt(n) {
   n = Number(n) || 0;
-  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
-  if (n >= 1e3) return (n/1e3).toFixed(1)+'k';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k';
   return String(Math.round(n));
 }
-function pct(a,b) {
-  a = Number(a)||0; b = Number(b)||0;
-  return b ? ((a/b)*100).toFixed(1)+'%' : '0%';
+function pct(a, b) {
+  a = Number(a) || 0; b = Number(b) || 0;
+  return b ? ((a / b) * 100).toFixed(1) + '%' : '0%';
 }
-function isOne(v) { return String(v ?? '').trim() === '1'; }
-function hasVal(v) {
-  const x = String(v ?? '').trim().toLowerCase();
-  return x !== '' && x !== 'n/a' && x !== 'null' && x !== 'undefined';
+function toISODate(v) {
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10);
+}
+function inferCity(name, cityCell) {
+  const direct = String(cityCell || '').trim();
+  if (direct) return direct;
+  const s = String(name || '').toLowerCase();
+  const cityMap = [
+    ['Mumbai',['mumbai','andheri','lower parel','mulund','goregaon','kandivali','powai','chembur','borivali','santacruz','mira road','thane','sanpada','navi mumbai']],
+    ['Delhi NCR',['delhi','gurugram','gurgaon','noida','ghaziabad','faridabad','rohini','pitampura','paschim vihar','dwarka','vasant kunj','defence colony','greater kailash','sda','anand vihar']],
+    ['Bengaluru',['bengaluru','bangalore','whitefield','banashankari','electronic city','sadashiva','yelahanka','hsr','kalyan nagar','domlur','bannerghatta','nagarbhavi','koramangala']],
+    ['Hyderabad',['hyderabad','hitec','kukatpally','manikonda','banjara','secunderabad','himayat']],
+    ['Pune',['pune','aundh','wakad','kalyani','nibm']],
+    ['Chennai',['chennai','adyar','anna nagar']],
+    ['Kolkata',['kolkata','salt lake','behala','southern avenue']]
+  ];
+  const hit = cityMap.find(([, keys]) => keys.some(k => s.includes(k)));
+  return hit ? hit[0] : 'Other';
 }
 
-/* ---------- METRICS ---------- */
+function rowMetric(r) {
+  return {
+    clinic:String(r[0] || '').trim(),
+    city:inferCity(r[0], r[1]),
+    total:num(r[2]),
+    sessions:num(r[3]),
+    foodI:num(r[5]),
+    medI:num(r[6]),
+    accI:num(r[7]),
+    si:num(r[9]),
+    atc:num(r[13]),
+    foodC:num(r[15]),
+    medC:num(r[16]),
+    accC:num(r[17])
+  };
+}
+function sumRows(rows, fallbackTotalRow) {
+  const base = rows.reduce((a, r) => {
+    a.total += r.total; a.sessions += r.sessions; a.foodI += r.foodI; a.medI += r.medI; a.accI += r.accI;
+    a.si += r.si; a.atc += r.atc; a.foodC += r.foodC; a.medC += r.medC; a.accC += r.accC;
+    return a;
+  }, {total:0,sessions:0,foodI:0,medI:0,accI:0,si:0,atc:0,foodC:0,medC:0,accC:0});
+  if (!rows.length && fallbackTotalRow) Object.assign(base, fallbackTotalRow);
+  base.clinicUsers = rows.reduce((sum, r) => sum + r.total, 0);
+  base.topClinics = rows.map(r => [r.clinic, r.total]).sort((a,b) => b[1] - a[1]).slice(0,10);
+  base.cityBreakdown = rows.reduce((acc, r) => {
+    acc[r.city] = (acc[r.city] || 0) + r.total;
+    return acc;
+  }, {});
+  return base;
+}
+function parseSheetModel(rows) {
+  const startDate = toISODate(rows[0]?.[2]);
+  const endDate = toISODate(rows[1]?.[2]);
+  const totalRaw = rows.find(r => String(r[0] || '').trim().toLowerCase() === 'total');
+  if (!totalRaw) throw new Error('Could not find Total row in sheet');
+  const totalRow = rowMetric(totalRaw);
+  const clinicRows = rows
+    .map(rowMetric)
+    .filter(r => r.clinic && !['total','clinic name'].includes(r.clinic.toLowerCase()) && r.total > 0);
+  return {startDate, endDate, totalRow, clinicRows};
+}
+function getFilteredData() {
+  if (!rawModel) return null;
+  const city = document.getElementById('cityFilter').value;
+  const rows = rawModel.clinicRows.filter(r => city === 'all' || r.city === city);
+  const d = city === 'all' ? sumRows(rawModel.clinicRows, rawModel.totalRow) : sumRows(rows, null);
+  if (city === 'all') {
+    d.total = rawModel.totalRow.total;
+    d.sessions = rawModel.totalRow.sessions;
+    d.foodI = rawModel.totalRow.foodI;
+    d.medI = rawModel.totalRow.medI;
+    d.accI = rawModel.totalRow.accI;
+    d.si = rawModel.totalRow.si;
+    d.atc = rawModel.totalRow.atc;
+    d.foodC = rawModel.totalRow.foodC;
+    d.medC = rawModel.totalRow.medC;
+    d.accC = rawModel.totalRow.accC;
+  }
+  d.city = city;
+  d.startDate = rawModel.startDate;
+  d.endDate = rawModel.endDate;
+  d.availableRows = rows;
+  return d;
+}
+function populateFilters() {
+  const start = document.getElementById('startDate');
+  const end = document.getElementById('endDate');
+  if (rawModel.startDate) start.value = rawModel.startDate;
+  if (rawModel.endDate) end.value = rawModel.endDate;
+  const select = document.getElementById('cityFilter');
+  const current = select.value;
+  const cities = [...new Set(rawModel.clinicRows.map(r => r.city))].sort();
+  select.innerHTML = '<option value="all">All cities</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join('');
+  select.value = cities.includes(current) ? current : 'all';
+  document.getElementById('filterHint').textContent = rawModel.startDate
+    ? `Source summary date: ${rawModel.startDate} to ${rawModel.endDate || rawModel.startDate}. Date range changes need matching data in the sheet.`
+    : 'Date is read from the current summary sheet. City is inferred from clinic names when the City column is blank.';
+}
+
 function buildMetrics(d) {
   const cards = [
-    {label:'Total users',   val:d.total.toLocaleString(), sub:'tracked today',                   ac:'#7f6fff'},
-    {label:'Session rate',  val:pct(d.sessions,d.total),  sub:fmt(d.sessions)+' sessions',       ac:'#1fcf8e'},
-    {label:'Login rate',    val:pct(d.loggedIn,d.total),  sub:fmt(d.loggedIn)+' logged in',      ac:'#4a9eff'},
-    {label:'Clinic-linked', val:fmt(d.clinicUsers),       sub:pct(d.clinicUsers,d.total),        ac:'#f5a623'},
-    {label:'Add to cart',   val:fmt(d.atc),               sub:'cart rate '+pct(d.atc,d.total),   ac:'#ff6b4a'},
-    {label:'With intent',   val:fmt(d.si),                sub:'intent rate '+pct(d.si,d.total),  ac:'#7f6fff'}
+    {label:'Total users', val:d.total.toLocaleString(), sub:d.city === 'all' ? 'all cities' : d.city, ac:'#7f6fff'},
+    {label:'Session rate', val:pct(d.sessions,d.total), sub:fmt(d.sessions)+' sessions', ac:'#1fcf8e'},
+    {label:'With intent', val:fmt(d.si), sub:'intent rate '+pct(d.si,d.total), ac:'#4a9eff'},
+    {label:'Add to cart', val:fmt(d.atc), sub:'cart rate '+pct(d.atc,d.total), ac:'#ff6b4a'},
+    {label:'Food intent', val:fmt(d.foodI), sub:fmt(d.foodC)+' carts', ac:'#f5a623'},
+    {label:'Clinics', val:fmt(d.availableRows.length), sub:'in selected filter', ac:'#7f6fff'}
   ];
   document.getElementById('metricsGrid').innerHTML = cards.map(c => `
     <div class="mcard" style="--ac:${c.ac}">
-      <div class="mlabel">${c.label}</div>
-      <div class="mval">${c.val}</div>
-      <div class="msub">${c.sub}</div>
+      <div class="mlabel">${c.label}</div><div class="mval">${c.val}</div><div class="msub">${c.sub}</div>
     </div>`).join('');
 }
 
-/* ---------- CHARTS ---------- */
 const TC = 'rgba(255,255,255,0.38)';
 const GC = 'rgba(255,255,255,0.05)';
-const baseO = {
-  responsive:true, maintainAspectRatio:false,
-  plugins:{legend:{display:false}},
-  animation:{duration:500}
-};
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-}
-function makeChart(id, cfg) {
-  destroyChart(id);
-  charts[id] = new Chart(document.getElementById(id), cfg);
-}
-function axis(extra={}) {
-  return {
-    ticks:{color:TC, font:{size:10}, ...(extra.ticks||{})},
-    grid:{color:GC},
-    border:{color:'transparent'},
-    ...extra
-  };
-}
-
+const baseO = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},animation:{duration:500}};
+function destroyChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+function makeChart(id,cfg){ destroyChart(id); charts[id] = new Chart(document.getElementById(id), cfg); }
+function axis(extra = {}){ return {ticks:{color:TC,font:{size:10},...(extra.ticks || {})},grid:{color:GC},border:{color:'transparent'},...extra}; }
 function buildCharts(d) {
-  const {total,sessions,si,atc,foodI,medI,accI,foodC,medC,accC,topClinics,loggedIn,clinicUsers} = d;
-
-  makeChart('funnelChart',{
-    type:'bar',
-    data:{
-      labels:['Total','Sessions','Intent','Cart'],
-      datasets:[{
-        data:[total,sessions,si,atc],
-        backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#ff6b4a'],
-        borderRadius:6, borderSkipped:false
-      }]
-    },
-    options:{...baseO, scales:{
-      x:axis({ticks:{color:TC,font:{size:11},autoSkip:false,maxRotation:0}}),
-      y:axis({ticks:{callback:v=>fmt(v)}})
-    }}
-  });
-
-  const intentTotal = foodI + medI + accI;
-  document.getElementById('intentLegend').innerHTML = [
-    ['#1fcf8e','Food',    pct(foodI,intentTotal)],
-    ['#4a9eff','Medicine',pct(medI, intentTotal)],
-    ['#ff6b4a','Accessories',pct(accI,intentTotal)]
-  ].map(([c,l,p])=>`<div class="li"><div class="ld" style="background:${c};"></div>${l} ${p}</div>`).join('');
-
-  makeChart('intentChart',{
-    type:'doughnut',
-    data:{
-      labels:['Food','Medicine','Accessories'],
-      datasets:[{
-        data:[foodI,medI,accI],
-        backgroundColor:['#1fcf8e','#4a9eff','#ff6b4a'],
-        borderWidth:0
-      }]
-    },
-    options:{...baseO, cutout:'65%'}
-  });
-
-  makeChart('convChart',{
-    type:'bar',
-    data:{
-      labels:['Food','Medicine','Accessories'],
-      datasets:[
-        {label:'Intent', data:[foodI,medI,accI], backgroundColor:'#1fcf8e', borderRadius:4},
-        {label:'Cart',   data:[foodC,medC,accC], backgroundColor:'#4a5568', borderRadius:4}
-      ]
-    },
-    options:{...baseO, scales:{
-      x:axis(),
-      y:axis({ticks:{callback:v=>fmt(v)}})
-    }}
-  });
-
-  makeChart('rateChart',{
-    type:'bar',
-    data:{
-      labels:['Session','Login','Clinic','Intent','Cart'],
-      datasets:[{
-        data:[
-          total ? +((sessions/total)*100).toFixed(1) : 0,
-          total ? +((loggedIn/total)*100).toFixed(1) : 0,
-          total ? +((clinicUsers/total)*100).toFixed(1) : 0,
-          total ? +((si/total)*100).toFixed(1) : 0,
-          total ? +((atc/total)*100).toFixed(1) : 0
-        ],
-        backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#f5a623','#ff6b4a'],
-        borderRadius:6, borderSkipped:false
-      }]
-    },
-    options:{...baseO, scales:{
-      x:axis({ticks:{autoSkip:false,maxRotation:0}}),
-      y:axis({ticks:{callback:v=>v+'%'}, max:100})
-    }}
-  });
-
-  makeChart('clinicChart',{
-    type:'bar',
-    data:{
-      labels:topClinics.map(([k])=>k.length>48?k.slice(0,48)+'…':k),
-      datasets:[{
-        label:'Users',
-        data:topClinics.map(([,v])=>v),
-        backgroundColor:'#7f6fff', borderRadius:4
-      }]
-    },
-    options:{...baseO, indexAxis:'y', scales:{
-      x:axis({ticks:{callback:v=>fmt(v)}}),
-      y:axis({ticks:{autoSkip:false}, grid:{color:'transparent'}})
-    }}
-  });
+  const intentTotal = d.foodI + d.medI + d.accI;
+  makeChart('funnelChart',{type:'bar',data:{labels:['Total','Sessions','Intent','Cart'],datasets:[{data:[d.total,d.sessions,d.si,d.atc],backgroundColor:['#7f6fff','#1fcf8e','#4a9eff','#ff6b4a'],borderRadius:6,borderSkipped:false}]},options:{...baseO,scales:{x:axis({ticks:{color:TC,font:{size:11},autoSkip:false,maxRotation:0}}),y:axis({ticks:{callback:v=>fmt(v)}})}}});
+  document.getElementById('intentLegend').innerHTML = [['#1fcf8e','Food',pct(d.foodI,intentTotal)],['#4a9eff','Medicine',pct(d.medI,intentTotal)],['#ff6b4a','Accessories',pct(d.accI,intentTotal)]].map(([c,l,p]) => `<div class="li"><div class="ld" style="background:${c};"></div>${l} ${p}</div>`).join('');
+  makeChart('intentChart',{type:'doughnut',data:{labels:['Food','Medicine','Accessories'],datasets:[{data:[d.foodI,d.medI,d.accI],backgroundColor:['#1fcf8e','#4a9eff','#ff6b4a'],borderWidth:0}]},options:{...baseO,cutout:'65%'}});
+  makeChart('convChart',{type:'bar',data:{labels:['Food','Medicine','Accessories'],datasets:[{label:'Intent',data:[d.foodI,d.medI,d.accI],backgroundColor:'#1fcf8e',borderRadius:4},{label:'Cart',data:[d.foodC,d.medC,d.accC],backgroundColor:'#4a5568',borderRadius:4}]},options:{...baseO,scales:{x:axis(),y:axis({ticks:{callback:v=>fmt(v)}})}}});
+  makeChart('rateChart',{type:'bar',data:{labels:['Session','Intent','Cart'],datasets:[{data:[d.total ? +((d.sessions/d.total)*100).toFixed(1) : 0,d.total ? +((d.si/d.total)*100).toFixed(1) : 0,d.total ? +((d.atc/d.total)*100).toFixed(1) : 0],backgroundColor:['#7f6fff','#4a9eff','#ff6b4a'],borderRadius:6,borderSkipped:false}]},options:{...baseO,scales:{x:axis({ticks:{autoSkip:false,maxRotation:0}}),y:axis({ticks:{callback:v=>v+'%'},max:100})}}});
+  makeChart('clinicChart',{type:'bar',data:{labels:d.topClinics.map(([k]) => k.length > 48 ? k.slice(0,48) + '...' : k),datasets:[{label:'Users',data:d.topClinics.map(([,v]) => v),backgroundColor:'#7f6fff',borderRadius:4}]},options:{...baseO,indexAxis:'y',scales:{x:axis({ticks:{callback:v=>fmt(v)}}),y:axis({ticks:{autoSkip:false},grid:{color:'transparent'}})}}});
+}
+function renderDashboard() {
+  activeData = getFilteredData();
+  buildMetrics(activeData);
+  buildCharts(activeData);
+  answerWelcome();
 }
 
-/* ---------- DATA ---------- */
-function processRows(rows) {
-  const total       = rows.length;
-  const loggedIn    = rows.filter(r=>hasVal(r.user_id)).length;
-  const clinicUsers = rows.filter(r=>hasVal(r.clinic_billed_clinic)).length;
-  const sessions    = rows.filter(r=>isOne(r.session_start)).length;
-  const foodI = rows.filter(r=>isOne(r.food_intent)).length;
-  const medI  = rows.filter(r=>isOne(r.medicine_intent)).length;
-  const accI  = rows.filter(r=>isOne(r.accessories_intent)).length;
-  const foodC = rows.filter(r=>isOne(r.food_add_to_cart)).length;
-  const medC  = rows.filter(r=>isOne(r.medicine_add_to_cart)).length;
-  const accC  = rows.filter(r=>isOne(r.accessories_add_to_cart)).length;
-  const si  = rows.filter(r=>isOne(r.si)).length;
-  const atc = rows.filter(r=>isOne(r.add_to_cart)).length;
-
-  const clinicCount = {};
-  rows.forEach(r => {
-    const clinic = String(r.clinic_billed_clinic ?? '').trim();
-    if (clinic) clinicCount[clinic] = (clinicCount[clinic] || 0) + 1;
+function fetchSheetRows() {
+  return new Promise((resolve, reject) => {
+    const cb = '__veticSheetCallback_' + Date.now();
+    const script = document.createElement('script');
+    window[cb] = function(resp) {
+      delete window[cb]; script.remove();
+      try {
+        const rows = resp.table.rows.map(row => row.c.map(cell => cell ? (cell.f ?? cell.v ?? '') : ''));
+        resolve(rows);
+      } catch(e) { reject(new Error('Could not parse Google Sheet response')); }
+    };
+    script.src = `${GVIZ_URL}&tqx=responseHandler:${cb}&t=${Date.now()}`;
+    script.onerror = function(){ delete window[cb]; script.remove(); reject(new Error('Google Sheet script load failed')); };
+    document.body.appendChild(script);
   });
-  const topClinics = Object.entries(clinicCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
-
-  return {total,loggedIn,clinicUsers,sessions,foodI,medI,accI,foodC,medC,accC,si,atc,topClinics};
 }
-
-/* ---------- COUNTDOWN ---------- */
 function startCountdown() {
   if (cdInterval) clearInterval(cdInterval);
   nextRefresh = Date.now() + REFRESH_MS;
   cdInterval = setInterval(() => {
     const rem = Math.max(0, nextRefresh - Date.now());
-    const m = Math.floor(rem / 60000);
-    const s = Math.floor((rem % 60000) / 1000);
-    document.getElementById('countdown').textContent =
-      String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    document.getElementById('countdown').textContent = String(Math.floor(rem / 60000)).padStart(2,'0') + ':' + String(Math.floor((rem % 60000) / 1000)).padStart(2,'0');
     if (rem === 0) loadData();
   }, 1000);
 }
-
-/* ---------- LOAD ---------- */
 async function loadData() {
   setStatus('loading','Fetching live data...');
   hideErr();
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-
   try {
-    const res = await fetch(CSV_URL + '&t=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    const text = await res.text();
-
-    /* Detect if proxy returned HTML error page instead of CSV */
-    if (text.trim().startsWith('<')) {
-      throw new Error('Proxy returned HTML — sheet may not be publicly shared');
-    }
-
-    const parsed = Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      transformHeader: h => String(h || '').trim().toLowerCase()
-    });
-
-    if (!parsed.data || !parsed.data.length) throw new Error('Sheet returned 0 rows');
-
-    const d = processRows(parsed.data);
-    buildMetrics(d);
-    buildCharts(d);
-
+    const rows = await fetchSheetRows();
+    if (!rows || !rows.length) throw new Error('Sheet returned 0 rows');
+    rawModel = parseSheetModel(rows);
+    populateFilters();
+    renderDashboard();
     const now = new Date();
-    document.getElementById('lastSync').textContent =
-      'Synced ' + now.toLocaleTimeString() + ' · ' + d.total.toLocaleString() + ' rows';
-    setStatus('live', 'Live · ' + d.total.toLocaleString() + ' rows');
+    document.getElementById('lastSync').textContent = 'Synced ' + now.toLocaleTimeString() + ' - ' + rawModel.totalRow.total.toLocaleString() + ' users';
+    setStatus('live', 'Live - ' + rawModel.totalRow.total.toLocaleString() + ' users');
     startCountdown();
-
   } catch(e) {
     console.error(e);
     setStatus('error','Fetch failed');
     showErr(e.message);
-  } finally {
-    btn.classList.remove('spinning');
-  }
+  } finally { btn.classList.remove('spinning'); }
 }
 
-/* FIX 3: Expose manualRefresh on window so onclick="" can find it */
-window.manualRefresh = function() {
-  if (cdInterval) clearInterval(cdInterval);
-  loadData();
-};
+function chat(role, text) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + role;
+  el.innerHTML = text;
+  document.getElementById('chat').appendChild(el);
+  document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+}
+function topCities() {
+  return Object.entries(activeData.cityBreakdown || {}).sort((a,b) => b[1] - a[1]);
+}
+function answerQuestion(q) {
+  if (!activeData) return 'Data is still loading.';
+  const s = q.toLowerCase();
+  const cityLabel = activeData.city === 'all' ? 'all cities' : activeData.city;
+  if (s.includes('week') || s.includes('weekly')) {
+    return `This sheet currently gives one summary range: <strong>${activeData.startDate || 'unknown'}</strong> to <strong>${activeData.endDate || activeData.startDate || 'unknown'}</strong>. Weekly trend answers need daily rows or separate week rows in the sheet.`;
+  }
+  if (s.includes('city')) {
+    const cities = topCities().slice(0,5);
+    if (!cities.length) return 'No city-level data found for the selected filter.';
+    return 'Top cities by users: ' + cities.map(([c,v], i) => `<strong>${i+1}. ${c}</strong> ${v.toLocaleString()}`).join(', ') + '.';
+  }
+  if (s.includes('clinic') || s.includes('centre') || s.includes('center')) {
+    if (!activeData.topClinics.length) return 'No clinic rows found for the selected filter.';
+    return `Top clinics for <strong>${cityLabel}</strong>: ` + activeData.topClinics.slice(0,5).map(([c,v], i) => `<strong>${i+1}. ${c}</strong> ${v.toLocaleString()}`).join(', ') + '.';
+  }
+  if (s.includes('cart') || s.includes('atc')) {
+    return `Cart KPI for <strong>${cityLabel}</strong>: <strong>${activeData.atc.toLocaleString()}</strong> add-to-cart users, cart rate <strong>${pct(activeData.atc, activeData.total)}</strong>. Category carts: Food ${fmt(activeData.foodC)}, Medicine ${fmt(activeData.medC)}, Accessories ${fmt(activeData.accC)}.`;
+  }
+  if (s.includes('session')) {
+    return `Session KPI for <strong>${cityLabel}</strong>: <strong>${activeData.sessions.toLocaleString()}</strong> sessions, session rate <strong>${pct(activeData.sessions, activeData.total)}</strong>.`;
+  }
+  if (s.includes('food') || s.includes('medicine') || s.includes('access')) {
+    return `Intent mix for <strong>${cityLabel}</strong>: Food ${fmt(activeData.foodI)} (${pct(activeData.foodI, activeData.si)} of intent), Medicine ${fmt(activeData.medI)} (${pct(activeData.medI, activeData.si)}), Accessories ${fmt(activeData.accI)} (${pct(activeData.accI, activeData.si)}).`;
+  }
+  return `KPI summary for <strong>${cityLabel}</strong>: Total users <strong>${activeData.total.toLocaleString()}</strong>, sessions <strong>${activeData.sessions.toLocaleString()}</strong> (${pct(activeData.sessions, activeData.total)}), intent <strong>${activeData.si.toLocaleString()}</strong> (${pct(activeData.si, activeData.total)}), add to cart <strong>${activeData.atc.toLocaleString()}</strong> (${pct(activeData.atc, activeData.total)}).`;
+}
+function ask(q) {
+  const text = String(q || document.getElementById('askInput').value || '').trim();
+  if (!text) return;
+  chat('user', text);
+  chat('bot', answerQuestion(text));
+  document.getElementById('askInput').value = '';
+}
+function answerWelcome() {
+  const chatBox = document.getElementById('chat');
+  if (chatBox.dataset.ready) return;
+  chatBox.dataset.ready = '1';
+  chat('bot', 'Ask me things like <strong>top city</strong>, <strong>cart rate</strong>, <strong>top clinics</strong>, <strong>food intent</strong>, or <strong>week data</strong>. I answer from the currently loaded sheet and selected filters.');
+}
 
-/* Initial load */
+document.getElementById('refreshBtn').addEventListener('click', function(){ if (cdInterval) clearInterval(cdInterval); loadData(); });
+document.getElementById('cityFilter').addEventListener('change', renderDashboard);
+document.getElementById('startDate').addEventListener('change', renderDashboard);
+document.getElementById('endDate').addEventListener('change', renderDashboard);
+document.getElementById('askBtn').addEventListener('click', () => ask());
+document.getElementById('askInput').addEventListener('keydown', e => { if (e.key === 'Enter') ask(); });
+document.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => ask(btn.dataset.q)));
+
 loadData();
 </script>
 </body>
